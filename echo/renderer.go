@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/SHyx0rmZ/go-markdown-renderer-echo/renderer"
+	"github.com/SHyx0rmZ/go-markdown-renderer/renderer"
 	markdown "github.com/russross/blackfriday"
 )
 

@@ -1,8 +1,6 @@
 package renderer
 
-import (
-	"bytes"
-)
+import "bytes"
 
 type BlockCodeFunc func(out *bytes.Buffer, text []byte, lang string)
 type HeaderFunc func(out *bytes.Buffer, text func() bool, level int, id string)
