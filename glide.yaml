@@ -1,0 +1,4 @@
+package: github.com/SHyx0rmZ/go-markdown-renderer-echo
+import:
+- package: github.com/russross/blackfriday
+  version: ^1.4.0
