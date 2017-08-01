@@ -2,44 +2,65 @@ package echo
 
 import (
 	"bytes"
+	"fmt"
 	"strconv"
 
-	"fmt"
+	"github.com/SHyx0rmZ/go-markdown-renderer-echo/renderer"
 	markdown "github.com/russross/blackfriday"
 )
 
 func Renderer() markdown.Renderer {
-	m := &markdownMerger{}
-	m.linkPrefix = fmt.Sprintf("%p-", m)
-	return m
+	opts := &options{}
+	opts.linkPrefix = fmt.Sprintf("%p-", opts)
+
+	return &renderer.CustomizableRenderer{
+		BlockCode,
+		BlockQuote,
+		BlockHtml,
+		Header,
+		HRule,
+		List,
+		ListItem,
+		Paragraph,
+		Table,
+		TableRow,
+		TableHeaderCell,
+		TableCell,
+		Footnotes,
+		FootnoteItem,
+		TitleBlock,
+		AutoLink,
+		CodeSpan,
+		DoubleEmphasis,
+		Emphasis,
+		Image,
+		LineBreak,
+		Link(opts),
+		RawHtmlTag,
+		TripleEmphasis,
+		StrikeThrough,
+		FootnoteRef,
+		Entity,
+		NormalText,
+		DocumentHeader,
+		DocumentFooter(opts),
+		GetFlags,
+	}
 }
 
-type markdownLink struct {
-	Title   []byte
-	Content []byte
-	Link    []byte
-
-	next *markdownLink
-}
-
-type markdownMerger struct {
-	links      *markdownLink
-	linkPrefix string
-}
-
-func (markdownMerger) BlockCode(out *bytes.Buffer, text []byte, lang string) {
+func BlockCode(out *bytes.Buffer, text []byte, lang string) {
 	panic("implement me")
 }
 
-func (markdownMerger) BlockQuote(out *bytes.Buffer, text []byte) {
+func BlockQuote(out *bytes.Buffer, text []byte) {
 	panic("implement me")
 }
 
-func (markdownMerger) BlockHtml(out *bytes.Buffer, text []byte) {
+func BlockHtml(out *bytes.Buffer, text []byte) {
 	panic("implement me")
 }
 
-func (markdownMerger) Header(out *bytes.Buffer, text func() bool, level int, id string) {
+func Header(out *bytes.Buffer, text func() bool, level int, id string) {
 	marker := out.Len()
 
 	for i := 0; i <= level; i++ {
@@ -57,26 +78,24 @@ func (markdownMerger) Header(out *bytes.Buffer, text func() bool, level int, id 
 	out.WriteByte('\n')
 }
 
-func (markdownMerger) HRule(out *bytes.Buffer) {
+func HRule(out *bytes.Buffer) {
 	panic("implement me")
 }
 
-func (markdownMerger) List(out *bytes.Buffer, text func() bool, flags int) {
+func List(out *bytes.Buffer, text func() bool, flags int) {
 	if text() {
 		out.WriteByte('\n')
 	}
 }
 
-func (markdownMerger) ListItem(out *bytes.Buffer, text []byte, flags int) {
+func ListItem(out *bytes.Buffer, text []byte, flags int) {
 	out.WriteString("* ")
 	out.Write(text)
 	out.WriteByte('\n')
 }
 
-func (markdownMerger) Paragraph(out *bytes.Buffer, text func() bool) {
+func Paragraph(out *bytes.Buffer, text func() bool) {
 	marker := out.Len()
-
-	//out.WriteByte('\n')
 
 	if !text() {
 		out.Truncate(marker)
@@ -87,150 +106,125 @@ func (markdownMerger) Paragraph(out *bytes.Buffer, text func() bool) {
 	out.WriteByte('\n')
 }
 
-func (markdownMerger) Table(out *bytes.Buffer, header []byte, body []byte, columnData []int) {
+func Table(out *bytes.Buffer, header []byte, body []byte, columnData []int) {
 	panic("implement me")
 }
 
-func (markdownMerger) TableRow(out *bytes.Buffer, text []byte) {
+func TableRow(out *bytes.Buffer, text []byte) {
 	panic("implement me")
 }
 
-func (markdownMerger) TableHeaderCell(out *bytes.Buffer, text []byte, flags int) {
+func TableHeaderCell(out *bytes.Buffer, text []byte, flags int) {
 	panic("implement me")
 }
 
-func (markdownMerger) TableCell(out *bytes.Buffer, text []byte, flags int) {
+func TableCell(out *bytes.Buffer, text []byte, flags int) {
 	panic("implement me")
 }
 
-func (markdownMerger) Footnotes(out *bytes.Buffer, text func() bool) {
+func Footnotes(out *bytes.Buffer, text func() bool) {
 	panic("implement me")
 }
 
-func (markdownMerger) FootnoteItem(out *bytes.Buffer, name, text []byte, flags int) {
+func FootnoteItem(out *bytes.Buffer, name, text []byte, flags int) {
 	panic("implement me")
 }
 
-func (markdownMerger) TitleBlock(out *bytes.Buffer, text []byte) {
+func TitleBlock(out *bytes.Buffer, text []byte) {
 	panic("implement me")
 }
 
-func (markdownMerger) AutoLink(out *bytes.Buffer, link []byte, kind int) {
+func AutoLink(out *bytes.Buffer, link []byte, kind int) {
 	panic("implement me")
 }
 
-func (markdownMerger) CodeSpan(out *bytes.Buffer, text []byte) {
+func CodeSpan(out *bytes.Buffer, text []byte) {
 	out.WriteByte('`')
 	out.Write(text)
 	out.WriteByte('`')
 }
 
-func (markdownMerger) DoubleEmphasis(out *bytes.Buffer, text []byte) {
+func DoubleEmphasis(out *bytes.Buffer, text []byte) {
 	panic("implement me")
 }
 
-func (markdownMerger) Emphasis(out *bytes.Buffer, text []byte) {
+func Emphasis(out *bytes.Buffer, text []byte) {
 	out.WriteByte('_')
 	out.Write(text)
 	out.WriteByte('_')
 }
 
-func (markdownMerger) Image(out *bytes.Buffer, link []byte, title []byte, alt []byte) {
+func Image(out *bytes.Buffer, link []byte, title []byte, alt []byte) {
 	panic("implement me")
 }
 
-func (markdownMerger) LineBreak(out *bytes.Buffer) {
+func LineBreak(out *bytes.Buffer) {
 	panic("implement me")
 }
 
-func (m *markdownMerger) link(link []byte, title []byte, content []byte) int {
-	if m.links == nil {
-		m.links = &markdownLink{
-			Title:   title,
-			Content: content,
-			Link:    link,
-		}
-
-		return 0
-	}
-
-	current := m.links
-	i := 1
-
-	for current.next != nil {
-		i++
-		current = current.next
-	}
-
-	current.next = &markdownLink{
-		Title:   title,
-		Content: content,
-		Link:    link,
-	}
-
-	return i
-}
-
-func (m *markdownMerger) Link(out *bytes.Buffer, link []byte, title []byte, content []byte) {
-	out.WriteByte('[')
-	out.Write(content)
-	out.WriteByte(']')
-	out.WriteByte('[')
-	out.WriteString(m.linkPrefix + strconv.Itoa(m.link(link, title, content)))
-	out.WriteByte(']')
-}
-
-func (markdownMerger) RawHtmlTag(out *bytes.Buffer, tag []byte) {
-	panic("implement me")
-}
-
-func (markdownMerger) TripleEmphasis(out *bytes.Buffer, text []byte) {
-	panic("implement me")
-}
-
-func (markdownMerger) StrikeThrough(out *bytes.Buffer, text []byte) {
-	panic("implement me")
-}
-
-func (markdownMerger) FootnoteRef(out *bytes.Buffer, ref []byte, id int) {
-	panic("implement me")
-}
-
-func (markdownMerger) Entity(out *bytes.Buffer, entity []byte) {
-	panic("implement me")
-}
-
-func (markdownMerger) NormalText(out *bytes.Buffer, text []byte) {
-	out.Write(text)
-}
-
-func (markdownMerger) DocumentHeader(out *bytes.Buffer) {
-}
-
-func (m markdownMerger) DocumentFooter(out *bytes.Buffer) {
-	current := m.links
-	i := 0
-
-	for current != nil {
+func Link(opts *options) renderer.LinkFunc {
+	return func(out *bytes.Buffer, link []byte, title []byte, content []byte) {
 		out.WriteByte('[')
-		out.WriteString(m.linkPrefix + strconv.Itoa(i))
+		out.Write(content)
 		out.WriteByte(']')
-		out.WriteByte(':')
-		out.WriteByte(' ')
-		out.Write(current.Link)
-		if len(current.Title) != 0 {
-			out.WriteByte(' ')
-			out.WriteByte('"')
-			out.Write(current.Title)
-			out.WriteByte('"')
-		}
-		out.WriteByte('\n')
-
-		current = current.next
-		i++
+		out.WriteByte('[')
+		out.WriteString(opts.linkPrefix + strconv.Itoa(opts.link(link, title, content)))
+		out.WriteByte(']')
 	}
 }
 
-func (markdownMerger) GetFlags() int {
+func RawHtmlTag(out *bytes.Buffer, tag []byte) {
+	panic("implement me")
+}
+
+func TripleEmphasis(out *bytes.Buffer, text []byte) {
+	panic("implement me")
+}
+
+func StrikeThrough(out *bytes.Buffer, text []byte) {
+	panic("implement me")
+}
+
+func FootnoteRef(out *bytes.Buffer, ref []byte, id int) {
+	panic("implement me")
+}
+
+func Entity(out *bytes.Buffer, entity []byte) {
+	panic("implement me")
+}
+
+func NormalText(out *bytes.Buffer, text []byte) {
+	out.Write(text)
+}
+
+func DocumentHeader(out *bytes.Buffer) {}
+
+func DocumentFooter(opts *options) renderer.EmptyFunc {
+	return func(out *bytes.Buffer) {
+		current := opts.links
+		i := 0
+
+		for current != nil {
+			out.WriteByte('[')
+			out.WriteString(opts.linkPrefix + strconv.Itoa(i))
+			out.WriteByte(']')
+			out.WriteByte(':')
+			out.WriteByte(' ')
+			out.Write(current.Link)
+			if len(current.Title) != 0 {
+				out.WriteByte(' ')
+				out.WriteByte('"')
+				out.Write(current.Title)
+				out.WriteByte('"')
+			}
+			out.WriteByte('\n')
+
+			current = current.next
+			i++
+		}
+	}
+}
+
+func GetFlags() int {
 	return 0
 }
