@@ -10,7 +10,7 @@ import (
 )
 
 func Renderer(maximumLineLength int) markdown.Renderer {
-	return &renderer.CustomizableRenderer{
+	return &renderer.Customizable{
 		echo.BlockCode,
 		echo.BlockQuote,
 		echo.BlockHtml,

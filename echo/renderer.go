@@ -13,7 +13,7 @@ func Renderer() markdown.Renderer {
 	opts := &options{}
 	opts.linkPrefix = fmt.Sprintf("%p-", opts)
 
-	return &renderer.CustomizableRenderer{
+	return &renderer.Customizable{
 		BlockCode,
 		BlockQuote,
 		BlockHtml,
