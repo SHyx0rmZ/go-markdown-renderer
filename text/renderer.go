@@ -9,6 +9,11 @@ import (
 	markdown "github.com/russross/blackfriday"
 )
 
+// Renderer is a Markdown renderer that emits plain text. This can be used to
+// prepare a Markdown document for communication channels like chat messaging
+// or email. To wrap at a certain amount of characters, set maximumLineLength
+// to a value greater than 0. The renderer will take a best effort approach
+// to try and make sure lines break before the specified line length.
 func Renderer(maximumLineLength int) markdown.Renderer {
 	return &renderer.Customizable{
 		echo.BlockCode,
