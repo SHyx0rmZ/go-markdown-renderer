@@ -9,9 +9,9 @@ import (
 	markdown "github.com/russross/blackfriday"
 )
 
-// Renderer is a Markdown renderer that will emit Markdown again. This can be
-// used for things like modifying multiple Markdown documents, so you can
-// merge them later.
+// Renderer returns a Markdown renderer that will emit Markdown again. This
+// can be used for things like modifying multiple Markdown documents, so you
+// can merge them later.
 func Renderer() markdown.Renderer {
 	opts := &options{}
 	opts.linkPrefix = fmt.Sprintf("%p-", opts)
