@@ -15,7 +15,7 @@ import (
 // maximumLineLength to a value greater than 0. The renderer will take a best
 // effort approach to try and make sure lines break before the specified line
 // length.
-func Renderer(maximumLineLength int) markdown.Renderer {
+func Renderer(maximumLineLength int) *renderer.Customizable {
 	return &renderer.Customizable{
 		echo.BlockCode,
 		echo.BlockQuote,

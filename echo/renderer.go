@@ -12,7 +12,7 @@ import (
 // Renderer returns a Markdown renderer that will emit Markdown again. This
 // can be used for things like modifying multiple Markdown documents, so you
 // can merge them later.
-func Renderer() markdown.Renderer {
+func Renderer() *renderer.Customizable {
 	opts := &options{}
 	opts.linkPrefix = fmt.Sprintf("%p-", opts)
 
