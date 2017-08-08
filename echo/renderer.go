@@ -66,7 +66,7 @@ func BlockHtml(out *bytes.Buffer, text []byte) {
 func Header(out *bytes.Buffer, text func() bool, level int, id string) {
 	marker := out.Len()
 
-	for i := 0; i <= level; i++ {
+	for i := 0; i < level; i++ {
 		out.WriteByte('#')
 	}
 
