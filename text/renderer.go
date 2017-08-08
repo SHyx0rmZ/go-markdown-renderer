@@ -6,7 +6,6 @@ import (
 
 	"github.com/SHyx0rmZ/go-markdown-renderer/echo"
 	"github.com/SHyx0rmZ/go-markdown-renderer/renderer"
-	markdown "github.com/russross/blackfriday"
 )
 
 // Renderer returns a Markdown renderer that emits plain text. This can be

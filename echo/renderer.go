@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/SHyx0rmZ/go-markdown-renderer/renderer"
-	markdown "github.com/russross/blackfriday"
 )
 
 // Renderer returns a Markdown renderer that will emit Markdown again. This
