@@ -147,7 +147,11 @@ func CodeSpan(out *bytes.Buffer, text []byte) {
 }
 
 func DoubleEmphasis(out *bytes.Buffer, text []byte) {
-	panic("implement me")
+	out.WriteByte('*')
+	out.WriteByte('*')
+	out.Write(text)
+	out.WriteByte('*')
+	out.WriteByte('*')
 }
 
 func Emphasis(out *bytes.Buffer, text []byte) {
