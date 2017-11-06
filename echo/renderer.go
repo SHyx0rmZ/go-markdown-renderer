@@ -196,7 +196,7 @@ func FootnoteRef(out *bytes.Buffer, ref []byte, id int) {
 }
 
 func Entity(out *bytes.Buffer, entity []byte) {
-	panic("implement me")
+	out.Write(entity)
 }
 
 func NormalText(out *bytes.Buffer, text []byte) {
