@@ -2,6 +2,7 @@ package text
 
 import (
 	"bytes"
+	"html"
 	"strings"
 
 	"github.com/SHyx0rmZ/go-markdown-renderer/echo"
@@ -33,16 +34,16 @@ func Renderer(maximumLineLength int) *renderer.Customizable {
 		echo.TitleBlock,
 		echo.AutoLink,
 		echo.CodeSpan,
-		echo.DoubleEmphasis,
+		DoubleEmphasis,
 		Emphasis,
 		echo.Image,
 		echo.LineBreak,
 		Link,
-		echo.RawHtmlTag,
+		RawHtmlTag,
 		echo.TripleEmphasis,
 		echo.StrikeThrough,
 		echo.FootnoteRef,
-		echo.Entity,
+		Entity,
 		NormalText,
 		echo.DocumentHeader,
 		DocumentFooter,
@@ -120,6 +121,10 @@ func Paragraph(maximumLineLength int) renderer.TextFuncFunc {
 	}
 }
 
+func DoubleEmphasis(out *bytes.Buffer, text []byte) {
+	out.Write(text)
+}
+
 func Emphasis(out *bytes.Buffer, text []byte) {
 	out.Write(text)
 }
@@ -130,6 +135,14 @@ func Link(out *bytes.Buffer, link []byte, title []byte, content []byte) {
 	out.WriteByte('(')
 	out.Write(link)
 	out.WriteByte(')')
+}
+
+func RawHtmlTag(out *bytes.Buffer, tag []byte) {
+	out.Write(tag)
+}
+
+func Entity(out *bytes.Buffer, entity []byte) {
+	out.Write([]byte(html.UnescapeString(string(entity))))
 }
 
 func NormalText(out *bytes.Buffer, text []byte) {
