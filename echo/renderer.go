@@ -3,9 +3,12 @@ package echo
 import (
 	"bytes"
 	"fmt"
+	"regexp"
 	"strconv"
+	"text/tabwriter"
 
 	"github.com/SHyx0rmZ/go-markdown-renderer/renderer"
+	"github.com/russross/blackfriday"
 )
 
 // Renderer returns a Markdown renderer that will emit Markdown again. This
@@ -22,7 +25,7 @@ func Renderer() *renderer.Customizable {
 		Header,
 		HRule,
 		List,
-		ListItem,
+		ListItem(opts),
 		Paragraph,
 		Table,
 		TableRow,
@@ -51,7 +54,18 @@ func Renderer() *renderer.Customizable {
 }
 
 func BlockCode(out *bytes.Buffer, text []byte, lang string) {
-	panic("implement me")
+	out.WriteByte('`')
+	out.WriteByte('`')
+	out.WriteByte('`')
+	if lang != "" {
+		out.WriteString(lang)
+	}
+	out.WriteByte('\n')
+	out.Write(text)
+	out.WriteByte('`')
+	out.WriteByte('`')
+	out.WriteByte('`')
+	out.WriteByte('\n')
 }
 
 func BlockQuote(out *bytes.Buffer, text []byte) {
@@ -90,10 +104,33 @@ func List(out *bytes.Buffer, text func() bool, flags int) {
 	}
 }
 
-func ListItem(out *bytes.Buffer, text []byte, flags int) {
-	out.WriteString("* ")
-	out.Write(text)
-	out.WriteByte('\n')
+func ListItem(opts *options) renderer.TextFlagsFunc {
+	return func(out *bytes.Buffer, text []byte, flags int) {
+		if flags&blackfriday.LIST_ITEM_BEGINNING_OF_LIST == blackfriday.LIST_ITEM_BEGINNING_OF_LIST {
+			opts.listIndex = 0
+		}
+		if flags&blackfriday.LIST_ITEM_CONTAINS_BLOCK == blackfriday.LIST_ITEM_CONTAINS_BLOCK {
+			if bytes.ContainsRune(text, '\n') {
+				text = regexp.MustCompile(`\n(\S+)`).ReplaceAll(text, []byte("\n   $1"))
+				text = regexp.MustCompile(":\\n\\n(\\s*)```").ReplaceAll(text, []byte(":\n$1```"))
+			}
+
+			text = append(text, '\n')
+		}
+		switch {
+		case flags&blackfriday.LIST_TYPE_ORDERED == blackfriday.LIST_TYPE_ORDERED:
+			opts.listIndex++
+			out.WriteString(fmt.Sprintf("%d. ", opts.listIndex))
+		case flags&blackfriday.LIST_TYPE_DEFINITION == blackfriday.LIST_TYPE_DEFINITION:
+			out.WriteString("- ")
+		case flags&blackfriday.LIST_TYPE_TERM == blackfriday.LIST_TYPE_TERM:
+			out.WriteString("* ")
+		default:
+			out.WriteString("* ")
+		}
+		out.Write(text)
+		out.WriteByte('\n')
+	}
 }
 
 func Paragraph(out *bytes.Buffer, text func() bool) {
@@ -109,19 +146,27 @@ func Paragraph(out *bytes.Buffer, text func() bool) {
 }
 
 func Table(out *bytes.Buffer, header []byte, body []byte, columnData []int) {
-	panic("implement me")
+	w := tabwriter.NewWriter(out, 2, 8, 1, '\t', 0)
+	w.Write(header)
+	w.Write(body)
+	w.Flush()
+
+	out.WriteByte('\n')
 }
 
 func TableRow(out *bytes.Buffer, text []byte) {
-	panic("implement me")
+	out.Write(bytes.TrimSpace(text))
+	out.WriteByte('\n')
 }
 
 func TableHeaderCell(out *bytes.Buffer, text []byte, flags int) {
-	panic("implement me")
+	out.Write(text)
+	out.WriteByte('\t')
 }
 
 func TableCell(out *bytes.Buffer, text []byte, flags int) {
-	panic("implement me")
+	out.Write(text)
+	out.WriteByte('\t')
 }
 
 func Footnotes(out *bytes.Buffer, text func() bool) {
@@ -161,11 +206,23 @@ func Emphasis(out *bytes.Buffer, text []byte) {
 }
 
 func Image(out *bytes.Buffer, link []byte, title []byte, alt []byte) {
-	panic("implement me")
+	out.WriteByte('!')
+	out.WriteByte('[')
+	out.Write(alt)
+	out.WriteByte(']')
+	out.WriteByte('(')
+	out.Write(link)
+	if len(title) > 0 {
+		out.WriteByte(' ')
+		out.WriteByte('"')
+		out.Write(title)
+		out.WriteByte('"')
+	}
+	out.WriteByte(')')
 }
 
 func LineBreak(out *bytes.Buffer) {
-	panic("implement me")
+	out.WriteByte('\n')
 }
 
 func Link(opts *options) renderer.LinkFunc {

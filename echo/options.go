@@ -11,6 +11,7 @@ type markdownLink struct {
 type options struct {
 	links      *markdownLink
 	linkPrefix string
+	listIndex  int
 }
 
 func (opts *options) link(link []byte, title []byte, content []byte) int {
